@@ -10,21 +10,31 @@ window.onload = function(){
     const signup = document.querySelector('form');
 
     //パスワード入力欄の存在確認
-    if (passwordInputs.length > 0){
-        console.log('パスワード入力欄が存在します');
-        Inputs.forEach(function(input){
-            input.addEventListener('click', function(e){
-                e.stopPropagation();
-                if (!passwordGenerated) {
-                    getPassword(12);
-                    passwordGenerated = true;
-                }
-                showTooltip(e.target, '推奨パスワード  ' + pwd);
-            });
-        });
-    }else{
-        console.log('パスワード入力欄が存在しません');
-    };
+    if (
+      window.location.href.includes('signup') ||
+      (document.querySelector('input[type="submit"]') &&
+      document.querySelector('input[type="submit"]').value.includes('signup')) ||
+      (document.querySelector('input[type="submit"]') &&
+      document.querySelector('input[type="submit"]').id.includes('signup'))
+  ){
+      if (passwordInputs.length > 0){
+          console.log('パスワード入力欄が存在します');
+          Inputs.forEach(function(input){
+              input.addEventListener('click', function(e){
+                  e.stopPropagation();
+                  if (!passwordGenerated) {
+                      getPassword(12);
+                      passwordGenerated = true;
+                  }
+                  showTooltip(e.target, '推奨パスワード  ' + pwd);
+              });
+          });
+      }else{
+          console.log('パスワード入力欄が存在しません');
+      };
+   }else{
+     console.log('サインアップページではありません')
+   };
 
 
     chrome.storage.local.get(["key"], function(result) {
@@ -60,6 +70,8 @@ window.onload = function(){
           signup.addEventListener("submit", function(event) {
             event.preventDefault();
             var currentHostname = window.location.hostname
+            const searchString1 = "username";
+            const searchString2 = "email";
             
             var formData = new FormData();
             chrome.storage.local.get(["key"], (result) => {
@@ -69,7 +81,7 @@ window.onload = function(){
               if (id) {
                 formData.append("user_id", id);
                 formData.append("hostname", currentHostname);
-                formData.append("email", document.querySelector('input[type="text"]').value);
+                formData.append("email", document.querySelector(`[id*="${searchString2}"]`).value);
                 formData.append("password", document.querySelector('input[type="password"]').value);
             
                 fetch("http://127.0.0.1:5000/data", {
